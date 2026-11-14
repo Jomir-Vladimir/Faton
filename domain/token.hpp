@@ -1,11 +1,11 @@
 #pragma once
 
-#include <iostream>
 #include <string>
+#include <cstdint>
 
 class Token {
 private:
-  short indexLine;
+  uint16_t indexLine;
   std::string key;
   std::string value;
 public:
@@ -15,7 +15,7 @@ public:
   void setValue(std::string newValue){
     value = newValue;
   }
-  void setIndexLine(short newIndexLine){
+  void setIndexLine(uint16_t newIndexLine){
     indexLine = newIndexLine;
   }
   bool compareKey(std::string otherKey){
@@ -30,16 +30,7 @@ public:
   std::string returnValue(){
     return value;
   }
-  short returnIndexLine(){
+  uint16_t returnIndexLine(){
     return indexLine;
-  }
-  void printKey(){
-    std::cout << key << "\n";
-  }
-  void printValue(){
-    std::cout << value << "\n";
-  }
-  void printIndexLine(){
-    std::cout << indexLine << "\n";
   }
 };

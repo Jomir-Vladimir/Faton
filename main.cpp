@@ -12,8 +12,8 @@ int main (int argc, char *argv[]){
   std::vector<exeCommand> exeCommands = {
   {"-H", test},
   {"--hex", test},
-  {"-G", generator},
-  {"--generate", generator},
+  {"-G", project_generator},
+  {"--generate", project_generator},
   {"-B", test},
   {"--build", test},
   {"-C", test},
