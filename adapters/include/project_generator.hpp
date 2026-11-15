@@ -4,7 +4,9 @@
 #include <string>
 #include <vector>
 #include <iostream>
+#include <cstdlib>
 #include <fstream>
+#include <cstring>
 #include <filesystem>
 
 void debugTokens(std::vector<Token> *tokens);

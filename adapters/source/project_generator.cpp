@@ -68,12 +68,13 @@ int tokenizator(std::string fileName, std::vector<Token> *tokens) {
 }
 
 int project_generator(std::vector<std::string> arguments){
-  std::vector<Token>tokens;                  /* creat tokens list */
+  std::vector<Token>tokens; /* creat tokens list */
+  int rezult;
   if (arguments.size() == 1){
     switch(fileCheck(arguments.back())){     /* call fileCheck function for checking file */
     case 1: { return 1; break; }             /*return error code*/
     case 2: { return 2; break; }             /*return error code*/
-    case 0: { int rezult = tokenizator(arguments.back(), &tokens); debugTokens(&tokens); return rezult; break; }
+    case 0: { rezult = tokenizator(arguments.back(), &tokens); debugTokens(&tokens);  break; }
               /* ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^
                       read error code by tokenizator                 print tokens list     return error code  */
     }
@@ -82,4 +83,19 @@ int project_generator(std::vector<std::string> arguments){
   else {
     return 5;
   }
+  for (uint8_t index = 0; index < tokens.size(); index++){
+    if (tokens[index].compareKey("dir")){
+      std::filesystem::create_directory(tokens[index].returnValue());
+    }
+    else {
+      std::string buffer = "touch " + tokens[index].returnValue();
+      const int count = buffer.size();
+      char str[count];
+      for (int i = 0; i < count; i++){
+       str[i] = buffer[i];
+      }
+      std::system(str);
+    }
+  }
+  return rezult;
 }
