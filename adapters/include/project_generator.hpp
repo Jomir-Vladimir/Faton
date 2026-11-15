@@ -13,7 +13,7 @@ void debugTokens(std::vector<Token> *tokens);
 
 int fileCheck(std::string fileName); /* check a file get by the user */
 
-bool tokenCheck(std::string *mainBuffer, Token *token); /* check a token created by tokenizato */
+int tokenCheck(std::string *mainBuffer, Token *token); /* check a token created by tokenizato */
 
 int tokenizator(std::string fileName, std::vector<Token> *tokens); /* split the file content into tokens */
 

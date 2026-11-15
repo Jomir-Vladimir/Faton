@@ -22,31 +22,41 @@ int fileCheck(std::string fileName) {
   return 2;
 }
 
-bool tokenCheck(std::string *mainBuffer, Token *token){
+int tokenCheck(std::string *mainBuffer, Token *token){
   bool openParathesis = false;                /* create the flag for detect open Parathesis */
   bool closeParathesis = false;               /* create the flag for detect close Parathesis */
   std::string *miniBuffer = new std::string;  /* create mini buffer for split the main buffer */
   for (char chr : *mainBuffer){               /* traversing the main buffer */
     switch(chr){                              /* check char from the main buffer */
-    case ')': { closeParathesis = true;       /* detecting closesing Parathesis */
-                token->setValue(*miniBuffer); /* write mini buffer as value in the token */
-                delete miniBuffer;            //< reset mini buffer
-                miniBuffer = new std::string; //< 
+    case ')': { if (!closeParathesis){
+                  closeParathesis = true;       /* detecting closesing Parathesis */
+                  token->setValue(*miniBuffer); /* write mini buffer as value in the token */
+                  delete miniBuffer;            //< reset mini buffer
+                  miniBuffer = new std::string;//< 
+                }
+                else {
+                  return 4;
+                }
                 break;}
 
-    case '(': { openParathesis = true;        /* detecting opening Parathesis */
-                token->setKey(*miniBuffer);   /* write mini buffer as key in the token */
-                delete miniBuffer;            //< reset mini buffer
-                miniBuffer = new std::string; //<
+    case '(': { if (!openParathesis){
+                  openParathesis = true;        /* detecting opening Parathesis */
+                  token->setKey(*miniBuffer);   /* write mini buffer as key in the token */
+                  delete miniBuffer;            //< reset mini buffer
+                  miniBuffer = new std::string; //<
+                }
+                else {
+                  return 3;
+                }
                 break;}
     case ' ': {}
     default : { if (!closeParathesis) {       /* check if closed Parathesis*/
                 *miniBuffer += chr; }         /* adding the char on the mini buffer */
-                else { return false; } }
+                else { return 6; } }
     }
   }
   delete miniBuffer;      /* delete mini buffer*/
-  return openParathesis && closeParathesis;
+  return openParathesis && closeParathesis ? 0 : 7;
 }
 
 int tokenizator(std::string fileName, std::vector<Token> *tokens) {
@@ -54,14 +64,28 @@ int tokenizator(std::string fileName, std::vector<Token> *tokens) {
   std::string buffer;                   /* create buffer*/
   for(uint16_t indexLine = 0; getline(file, buffer); indexLine++){         /* reading file */
     Token *token = new Token;           /* create raw token */
-    if (!tokenCheck(&buffer, token)){   /* check token with tokenCheck function*/
-      delete token;                     /* delete raw token */
-      return 3;                         /*return error code*/
-    }
-    else {
-      token->setIndexLine(indexLine);
-      tokens->push_back(*token);        /* adding raw token on tokens list */
-      delete token;                     /* delete raw token */
+    switch (tokenCheck(&buffer, token)){   /* check token with tokenCheck function*/
+      case 4:{
+        delete token;                     /* delete raw token */
+        return 4;
+        break;}                         /*return error code*/
+
+      case 3:{
+        delete token;                     /* delete raw token */
+        return 3;
+        break;}                         /*return error code*/
+
+      case 6:{
+        delete token;                     /* delete raw token */
+        return 6;
+        break;}                         /*return error code*/
+      
+       
+      case 0: {
+        token->setIndexLine(indexLine);
+        tokens->push_back(*token);        /* adding raw token on tokens list */
+        delete token;                     /* reset raw token */
+        break;}
     }
   }
   return 0; 
@@ -74,7 +98,7 @@ int project_generator(std::vector<std::string> arguments){
     switch(fileCheck(arguments.back())){     /* call fileCheck function for checking file */
     case 1: { return 1; break; }             /*return error code*/
     case 2: { return 2; break; }             /*return error code*/
-    case 0: { rezult = tokenizator(arguments.back(), &tokens); debugTokens(&tokens);  break; }
+    case 0: { rezult = tokenizator(arguments.back(), &tokens); break; }
               /* ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^
                       read error code by tokenizator                 print tokens list     return error code  */
     }
@@ -83,18 +107,20 @@ int project_generator(std::vector<std::string> arguments){
   else {
     return 5;
   }
-  for (uint8_t index = 0; index < tokens.size(); index++){
+  if (rezult == 0){
+    for (uint8_t index = 0; index < tokens.size(); index++){
     if (tokens[index].compareKey("dir")){
       std::filesystem::create_directory(tokens[index].returnValue());
     }
-    else {
+    if (tokens[index].compareKey("file")) {
       std::string buffer = "touch " + tokens[index].returnValue();
       const int count = buffer.size();
       char str[count];
       for (int i = 0; i < count; i++){
-       str[i] = buffer[i];
+        str[i] = buffer[i];
       }
       std::system(str);
+      }
     }
   }
   return rezult;
