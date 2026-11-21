@@ -109,18 +109,13 @@ int project_generator(std::vector<std::string> arguments){
   }
   if (rezult == 0){
     for (uint8_t index = 0; index < tokens.size(); index++){
-    if (tokens[index].compareKey("dir")){
-      std::filesystem::create_directory(tokens[index].returnValue());
-    }
-    if (tokens[index].compareKey("file")) {
-      std::string buffer = "touch " + tokens[index].returnValue();
-      const int count = buffer.size();
-      char str[count];
-      for (int i = 0; i < count; i++){
-        str[i] = buffer[i];
+      if (tokens[index].compareKey("dir")){
+        std::filesystem::create_directory(tokens[index].returnValue());
       }
-      std::system(str);
-      }
+      if (tokens[index].compareKey("file")) {
+        std::ofstream file(tokens[index].returnValue());
+        file.close();
+      } 
     }
   }
   return rezult;
